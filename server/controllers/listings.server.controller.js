@@ -13,6 +13,7 @@ var mongoose = require('mongoose'),
  */
 
 /* Create a listing */
+//                       request, response
 exports.create = function(req, res) {
 
   /* Instantiate a Listing */
@@ -47,9 +48,19 @@ exports.read = function(req, res) {
 exports.update = function(req, res) {
   var listing = req.listing;
 
+/*Sarah'sssssssssssssssssssssssssssssssssssssssssssssssssssss*/
   /* Replace the article's properties with the new properties found in req.body */
+listing.name = req.body.name;
+listing.code = req.body.code;
+listing.address = req.body.address;
   /* save the coordinates (located in req.results if there is an address property) */
+ if(req.results.address) {
+    listing.coordinates = {
+      latitude: req.results.lat, 
+      longitude: req.results.lng
+    };
   /* Save the article */
+  listing.save();
 };
 
 /* Delete a listing */
@@ -57,11 +68,19 @@ exports.delete = function(req, res) {
   var listing = req.listing;
 
   /* Remove the article */
+  listing.remove(function(err) {
+    if (err) throw err;
+  });
 };
 
 /* Retreive all the directory listings, sorted alphabetically by listing code */
 exports.list = function(req, res) {
   /* Your code here */
+  Listing.find({}, function (err, listings) {
+      if (err) throw err;
+      console.log('\nAll Listings\n');
+      console.log(listings);
+     });
 };
 
 /* 
@@ -71,6 +90,7 @@ exports.list = function(req, res) {
         bind it to the request object as the property 'listing', 
         then finally call next
  */
+ 
 exports.listingByID = function(req, res, next, id) {
   Listing.findById(id).exec(function(err, listing) {
     if(err) {
